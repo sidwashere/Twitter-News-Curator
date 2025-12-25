@@ -25,11 +25,16 @@ from twitter_poster import TwitterPoster
 # Load environment
 load_dotenv()
 
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 app = Flask(__name__)
 app.secret_key = secrets.token_hex(16)
 CORS(app)
 
 # Initialize bot components
+logger.info("Initializing bot components...")
 fetcher = NewsFetcher()
 tracker = ArticleTracker()
 
@@ -87,6 +92,8 @@ def fetch_articles_api():
         selected_sources = data.get('sources', fetcher.rss_feeds)
         limit = data.get('limit', 20)
         
+        logger.info(f"Fetching articles from {len(selected_sources)} sources, limit={limit}")
+        
         # Temporarily update sources
         original_feeds = fetcher.rss_feeds
         fetcher.rss_feeds = selected_sources
@@ -111,6 +118,8 @@ def fetch_articles_api():
     
     except Exception as e:
         logger.error(f"Error fetching articles: {str(e)}")
+        import traceback
+        traceback.print_exc()
         return jsonify({
             'success': False,
             'error': str(e)
@@ -120,69 +129,108 @@ def fetch_articles_api():
 @app.route('/api/generate-tweet', methods=['POST'])
 def generate_tweet_api():
     """Generate tweet for an article"""
-    data = request.json
-    article_url = data.get('article_url')
+    try:
+        data = request.json
+        article_url = data.get('article_url')
+        
+        logger.info(f"Generate tweet request for: {article_url}")
+        
+        if not article_url:
+            return jsonify({'error': 'article_url is required'}), 400
+        
+        # Fetch articles and find the one
+        articles = fetcher.fetch_latest_articles(limit=50)
+        article = next((a for a in articles if a['link'] == article_url), None)
+        
+        if not article:
+            logger.error(f"Article not found: {article_url}")
+            return jsonify({'error': 'Article not found'}), 404
+        
+        if not generator:
+            logger.error("AI generator not initialized")
+            return jsonify({'error': 'AI not configured. Check GEMINI_API_KEY in .env file.'}), 500
+        
+        # Generate tweet
+        logger.info("Generating tweet with AI...")
+        tweet_content = generator.generate_tweet(article)
+        
+        if not tweet_content:
+            logger.error("Tweet generation returned empty")
+            return jsonify({'error': 'Failed to generate tweet'}), 500
+        
+        full_tweet = generator.format_final_tweet(tweet_content, article['link'])
+        logger.info(f"Tweet generated successfully: {len(full_tweet)} chars")
+        
+        # Store in session for posting
+        session['current_article'] = article
+        session['current_tweet'] = full_tweet
+        session['current_content'] = tweet_content
+        
+        return jsonify({
+            'content': tweet_content,
+            'full_tweet': full_tweet,
+            'char_count': len(full_tweet),
+            'article': article
+        })
     
-    # Fetch articles and find the one
-    articles = fetcher.fetch_latest_articles(limit=50)
-    article = next((a for a in articles if a['link'] == article_url), None)
-    
-    if not article:
-        return jsonify({'error': 'Article not found'}), 404
-    
-    if not generator:
-        return jsonify({'error': 'AI not configured'}), 500
-    
-    # Generate tweet
-    tweet_content = generator.generate_tweet(article)
-    
-    if not tweet_content:
-        return jsonify({'error': 'Failed to generate tweet'}), 500
-    
-    full_tweet = generator.format_final_tweet(tweet_content, article['link'])
-    
-    # Store in session for posting
-    session['current_article'] = article
-    session['current_tweet'] = full_tweet
-    session['current_content'] = tweet_content
-    
-    return jsonify({
-        'content': tweet_content,
-        'full_tweet': full_tweet,
-        'char_count': len(full_tweet),
-        'article': article
-    })
+    except Exception as e:
+        logger.error(f"Error in generate_tweet_api: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
 
 
 @app.route('/api/regenerate-tweet', methods=['POST'])
 def regenerate_tweet():
     """Regenerate tweet with different parameters"""
-    data = request.json
-    article = session.get('current_article')
+    try:
+        data = request.json
+        article = session.get('current_article')
+        
+        if not article:
+            return jsonify({'error': 'No article in session. Please generate a tweet first.'}), 400
+        
+        if not generator:
+            return jsonify({'error': 'AI not configured. Check GEMINI_API_KEY.'}), 500
+        
+        # Apply custom parameters
+        temperature = float(data.get('temperature', 0.9))
+        tone = data.get('tone', 'default')
+        
+        # Log the regeneration request
+        print(f"Regenerating tweet for article: {article.get('title', 'Unknown')[:50]}...")
+        print(f"Parameters: tone={tone}, temperature={temperature}")
+        
+        # Generate new tweet
+        tweet_content = generator.generate_tweet(article, temperature=temperature)
+        
+        if not tweet_content:
+            return jsonify({'error': 'Failed to generate tweet. AI returned empty response.'}), 500
+        
+        full_tweet = generator.format_final_tweet(tweet_content, article['link'])
+        
+        # Update session
+        session['current_tweet'] = full_tweet
+        session['current_content'] = tweet_content
+        
+        print(f"Regenerated tweet: {tweet_content[:50]}...")
+        
+        return jsonify({
+            'content': tweet_content,
+            'full_tweet': full_tweet,
+            'char_count': len(full_tweet),
+            'success': True
+        })
     
-    if not article:
-        return jsonify({'error': 'No article in session'}), 400
-    
-    # Apply custom parameters
-    temperature = data.get('temperature', 0.9)
-    style = data.get('style', 'default')  # default, casual, professional, witty
-    
-    # TODO: Implement style variations
-    tweet_content = generator.generate_tweet(article)
-    
-    if not tweet_content:
-        return jsonify({'error': 'Failed to generate tweet'}), 500
-    
-    full_tweet = generator.format_final_tweet(tweet_content, article['link'])
-    
-    session['current_tweet'] = full_tweet
-    session['current_content'] = tweet_content
-    
-    return jsonify({
-        'content': tweet_content,
-        'full_tweet': full_tweet,
-        'char_count': len(full_tweet)
-    })
+    except Exception as e:
+        error_msg = f"Error regenerating tweet: {str(e)}"
+        print(error_msg)
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'error': error_msg,
+            'success': False
+        }), 500
 
 
 @app.route('/api/post-tweet', methods=['POST'])
@@ -262,6 +310,64 @@ def monitor():
     }
     
     return render_template('monitor.html', stats=stats)
+
+
+@app.route('/api/monitor/stats', methods=['GET'])
+def monitor_stats():
+    """Return live system statistics for monitor page"""
+    try:
+        import psutil
+        import os
+        from datetime import datetime
+        
+        # System stats
+        cpu_percent = psutil.cpu_percent(interval=1)
+        memory = psutil.virtual_memory()
+        disk = psutil.disk_usage('.')
+        
+        # Application stats
+        posted_count = tracker.get_posted_count()
+        
+        # Get recent activity from logs
+        recent_logs = []
+        log_file = 'logs/bot.log'
+        if os.path.exists(log_file):
+            try:
+                with open(log_file, 'r', encoding='utf-8', errors='ignore') as f:
+                    lines = f.readlines()
+                    recent_logs = lines[-10:]  # Last 10 log entries
+            except:
+                pass
+        
+        stats = {
+            'timestamp': datetime.now().isoformat(),
+            'system': {
+                'cpu_percent': round(cpu_percent, 1),
+                'memory_percent': round(memory.percent, 1),
+                'memory_used_gb': round(memory.used / (1024**3), 2),
+                'memory_total_gb': round(memory.total / (1024**3), 2),
+                'disk_percent': round(disk.percent, 1),
+                'disk_used_gb': round(disk.used / (1024**3), 2),
+                'disk_total_gb': round(disk.total / (1024**3), 2)
+            },
+            'application': {
+                'total_posts': posted_count,
+                'rss_feeds_count': len(fetcher.rss_feeds),
+                'twitter_connected': poster is not None,
+                'ai_connected': generator is not None,
+                'uptime': 'Active'
+            },
+            'recent_logs': [log.strip() for log in recent_logs if log.strip()]
+        }
+        
+        return jsonify(stats)
+    
+    except Exception as e:
+        print(f"Error getting monitor stats: {str(e)}")
+        return jsonify({
+            'error': str(e),
+            'timestamp': datetime.now().isoformat()
+        }), 500
 
 
 # ============= Settings API Endpoints =============

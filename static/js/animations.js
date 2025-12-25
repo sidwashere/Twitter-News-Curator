@@ -36,7 +36,8 @@ document.addEventListener('DOMContentLoaded', function () {
         duration: 0.6,
         stagger: 0.1,
         ease: 'back.out(1.2)',
-        delay: 0.3
+        delay: 0.3,
+        clearProps: 'all'
     });
 
     // Animate stats grid
@@ -46,7 +47,8 @@ document.addEventListener('DOMContentLoaded', function () {
         duration: 0.6,
         stagger: 0.12,
         ease: 'power2.out',
-        delay: 0.4
+        delay: 0.4,
+        clearProps: 'all'
     });
 
     // Animate article cards
@@ -67,7 +69,8 @@ document.addEventListener('DOMContentLoaded', function () {
         duration: 0.5,
         stagger: 0.1,
         ease: 'power2.out',
-        delay: 0.6
+        delay: 0.6,
+        clearProps: 'all'
     });
 
     // ==================== HOVER ANIMATIONS ====================
@@ -171,32 +174,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // ==================== NAVBAR SCROLL EFFECT ====================
 
-    let lastScroll = 0;
-    const navbar = document.querySelector('.navbar');
-
-    if (navbar) {
-        window.addEventListener('scroll', () => {
-            const currentScroll = window.pageYOffset;
-
-            if (currentScroll > 50) {
-                gsap.to(navbar, {
-                    backgroundColor: 'rgba(10, 14, 26, 0.95)',
-                    backdropFilter: 'blur(20px)',
-                    boxShadow: '0 4px 30px rgba(0, 0, 0, 0.3)',
-                    duration: 0.3
-                });
-            } else {
-                gsap.to(navbar, {
-                    backgroundColor: 'transparent',
-                    backdropFilter: 'blur(0px)',
-                    boxShadow: 'none',
-                    duration: 0.3
-                });
-            }
-
-            lastScroll = currentScroll;
-        });
-    }
+    // NOTE: Navbar scroll effect is now handled by navbar.js
+    // This prevents conflicts with theme-specific styling
 
     // ==================== NUMBER COUNTER ANIMATION ====================
 

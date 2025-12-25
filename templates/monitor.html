@@ -1,134 +1,156 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="monitor-page">
-    <header class="page-header">
-        <h2>Backend Monitor</h2>
-        <p class="subtitle">Real-time system status and activity logs</p>
+<div class="monitor-page" style="max-width: 1400px; margin: 0 auto; padding: 2rem;">
+    <header class="page-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h2>📊 System Monitor</h2>
+            <p class="subtitle">Real-time backend performance and activity monitoring</p>
+        </div>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            <span id="last-update" style="font-size: 0.875rem; color: var(--text-muted);">
+                Last updated: Just now
+            </span>
+            <label class="toggle" title="Auto-refresh every 5 seconds">
+                <input type="checkbox" id="auto-refresh" checked>
+                <span class="toggle-slider"></span>
+            </label>
+            <span style="font-size: 0.875rem;">Auto-refresh</span>
+        </div>
     </header>
 
-    <!-- System Status Cards -->
-    <div class="monitor-grid">
-        <div class="monitor-card">
-            <h3>
-                <span class="status-indicator active"></span>
-                Bot Status
-            </h3>
-            <div class="stat-row">
-                <span class="stat-label">Status:</span>
-                <span class="stat-value" style="color: var(--accent-success);">Running</span>
-            </div>
-            <div class="stat-row">
-                <span class="stat-label">Uptime:</span>
-                <span class="stat-value" id="uptime">3h 15m</span>
-            </div>
-            <div class="stat-row">
-                <span class="stat-label">Last Activity:</span>
-                <span class="stat-value" id="last-activity">2 min ago</span>
+    <!-- System Status Grid -->
+    <div class="stats-grid" style="margin-bottom: 2rem;">
+        <!-- CPU Usage -->
+        <div class="metric-card glass-card">
+            <div class="metric-label">💻 CPU Usage</div>
+            <div class="metric-value" id="cpu-usage">--</div>
+            <div class="metric-change" id="cpu-status">
+                Loading...
             </div>
         </div>
 
-        <div class="monitor-card">
-            <h3>
-                <span class="status-indicator active"></span>
-                API Connections
-            </h3>
-            <div class="stat-row">
-                <span class="stat-label">Twitter API:</span>
-                <span class="stat-value" style="color: var(--accent-success);">✓ Connected</span>
-            </div>
-            <div class="stat-row">
-                <span class="stat-label">Gemini AI:</span>
-                <span class="stat-value" style="color: var(--accent-success);">✓ Connected</span>
-            </div>
-            <div class="stat-row">
-                <span class="stat-label">RSS Feeds:</span>
-                <span class="stat-value">4 Active</span>
+        <!-- Memory Usage -->
+        <div class="metric-card glass-card">
+            <div class="metric-label">🧠 Memory</div>
+            <div class="metric-value" id="memory-usage">--</div>
+            <div style="font-size: 0.875rem; color: var(--text-muted); margin-top: 0.5rem;" id="memory-detail">
+                -- / -- GB
             </div>
         </div>
 
-        <div class="monitor-card">
-            <h3>
-                <span class="status-indicator active"></span>
-                Performance
-            </h3>
-            <div class="stat-row">
-                <span class="stat-label">Tweets Generated:</span>
-                <span class="stat-value" id="tweets-generated">{{ stats.total_posted or 0 }}</span>
+        <!-- Disk Usage -->
+        <div class="metric-card glass-card">
+            <div class="metric-label">💾 Disk Usage</div>
+            <div class="metric-value" id="disk-usage">--</div>
+            <div style="font-size: 0.875rem; color: var(--text-muted); margin-top: 0.5rem;" id="disk-detail">
+                -- / -- GB
             </div>
-            <div class="stat-row">
-                <span class="stat-label">Articles Fetched:</span>
-                <span class="stat-value" id="articles-fetched">127</span>
-            </div>
-            <div class="stat-row">
-                <span class="stat-label">Success Rate:</span>
-                <span class="stat-value">98%</span>
+        </div>
+
+        <!-- Total Posts -->
+        <div class="metric-card glass-card">
+            <div class="metric-label">📝 Total Posts</div>
+            <div class="metric-value" id="total-posts">{{ stats.total_posted }}</div>
+            <div style="font-size: 0.875rem; color: var(--text-muted); margin-top: 0.5rem;">
+                All time
             </div>
         </div>
     </div>
 
-    <!-- Activity Timeline -->
-    <div class="monitor-card" style="margin-bottom: 2rem;">
-        <h3>🕐 Recent Activity</h3>
-        <div class="activity-timeline">
-            <div class="activity-item">
-                <div class="activity-time">2 min ago</div>
-                <div class="activity-description">Fetched 9 articles from RSS feeds</div>
+    <!-- API Connection Status -->
+    <div class="section-header">
+        <h3 class="section-title">
+            <span style="font-size: 1.5rem;">🔌</span>
+            API Connections
+        </h3>
+    </div>
+
+    <div class="glass-card" style="padding: 2rem; margin-bottom: 2rem;">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+            <!-- Twitter API -->
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="font-size: 3rem;">🐦</div>
+                <div style="flex: 1;">
+                    <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem;">
+                        Twitter API
+                    </div>
+                    <div id="twitter-status">
+                        {% if stats.twitter_connected %}
+                        <span style="color: var(--accent-success);">● Connected</span>
+                        {% else %}
+                        <span style="color: var(--accent-error);">● Disconnected</span>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
-            <div class="activity-item">
-                <div class="activity-time">5 min ago</div>
-                <div class="activity-description">Generated tweet using Gemini AI</div>
+
+            <!-- AI Engine -->
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="font-size: 3rem;">🤖</div>
+                <div style="flex: 1;">
+                    <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem;">
+                        AI Engine (Gemini)
+                    </div>
+                    <div id="ai-status">
+                        {% if stats.ai_connected %}
+                        <span style="color: var(--accent-success);">● Active</span>
+                        {% else %}
+                        <span style="color: var(--accent-error);">● Offline</span>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
-            <div class="activity-item">
-                <div class="activity-time">12 min ago</div>
-                <div class="activity-description">Posted tweet to @bongoman_x</div>
-            </div>
-            <div class="activity-item">
-                <div class="activity-time">18 min ago</div>
-                <div class="activity-description">Checked duplicate articles (1 duplicate found)</div>
+
+            <!-- RSS Feeds -->
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div style="font-size: 3rem;">📡</div>
+                <div style="flex: 1;">
+                    <div style="font-weight: 600; color: var(--text-primary); margin-bottom: 0.25rem;">
+                        RSS Feeds
+                    </div>
+                    <div id="rss-status">
+                        <span style="color: var(--accent-success);">● {{ stats.rss_feeds }} sources active</span>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Live Logs -->
-    <div class="monitor-card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-            <h3>📋 Live Logs</h3>
-            <button class="btn btn-sm btn-secondary" id="clear-logs">Clear Logs</button>
-        </div>
+    <!-- Live Activity Log -->
+    <div class="section-header">
+        <h3 class="section-title">
+            <span style="font-size: 1.5rem;">📋</span>
+            Live Activity Log
+        </h3>
+        <button id="clear-logs" class="btn btn-secondary btn-sm">
+            Clear View
+        </button>
+    </div>
 
-        <div class="logs-container" id="logs-container">
-            <div class="log-entry info">
-                <span class="log-timestamp">[12:25:30]</span>
-                <span class="log-message">INFO: Initialized bot components</span>
+    <div class="glass-card" style="padding: 1.5rem;">
+        <div id="activity-log" style="max-height: 400px; overflow-y: auto;">
+            <div id="log-entries" style="font-family: 'Courier New', monospace; font-size: 0.875rem; line-height: 1.6;">
+                <div style="color: var(--text-muted); text-align: center; padding: 2rem;">
+                    Loading activity logs...
+                </div>
             </div>
-            <div class="log-entry success">
-                <span class="log-timestamp">[12:25:32]</span>
-                <span class="log-message">SUCCESS: Connected to Twitter API as @bongoman_x</span>
-            </div>
-            <div class="log-entry success">
-                <span class="log-timestamp">[12:25:33]</span>
-                <span class="log-message">SUCCESS: Gemini AI initialized with model gemini-2.5-flash</span>
-            </div>
-            <div class="log-entry info">
-                <span class="log-timestamp">[12:25:35]</span>
-                <span class="log-message">INFO: Starting RSS feed fetch...</span>
-            </div>
-            <div class="log-entry success">
-                <span class="log-timestamp">[12:25:38]</span>
-                <span class="log-message">SUCCESS: Fetched 9 articles from TechCrunch</span>
-            </div>
-            <div class="log-entry info">
-                <span class="log-timestamp">[12:25:40]</span>
-                <span class="log-message">INFO: Checking for duplicates...</span>
-            </div>
-            <div class="log-entry warning">
-                <span class="log-timestamp">[12:25:41]</span>
-                <span class="log-message">WARNING: Article already posted, skipping...</span>
-            </div>
-            <div class="log-entry info">
-                <span class="log-timestamp">[12:25:43]</span>
-                <span class="log-message">INFO: Generating tweet with AI...</span>
+        </div>
+    </div>
+
+    <!-- Performance Chart Placeholder -->
+    <div class="section-header" style="margin-top: 2rem;">
+        <h3 class="section-title">
+            <span style="font-size: 1.5rem;">📈</span>
+            Performance Metrics
+        </h3>
+    </div>
+
+    <div class="glass-card" style="padding: 2rem; text-align: center;">
+        <div style="opacity: 0.5;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">📊</div>
+            <div style="color: var(--text-muted);">
+                Performance charts coming soon
             </div>
         </div>
     </div>
@@ -137,53 +159,115 @@
 
 {% block scripts %}
 <script>
-    // Simulate real-time updates
-    function updateMonitor() {
-        const uptime = document.getElementById('uptime');
-        const lastActivity = document.getElementById('last-activity');
+    // Monitor Page - Live Stats
+    let autoRefresh = true;
+    let refreshInterval;
 
-        // Update every 30 seconds
-        setInterval(() => {
-            // Simulate uptime increase
-            // In production, this would come from backend API
-        }, 30000);
+    // Update stats from API
+    async function updateStats() {
+        try {
+            const response = await fetch('/api/monitor/stats');
+            const data = await response.json();
+
+            if (data.error) {
+                console.error('Stats error:', data.error);
+                return;
+            }
+
+            // Update system stats
+            if (data.system) {
+                document.getElementById('cpu-usage').textContent = data.system.cpu_percent + '%';
+                document.getElementById('memory-usage').textContent = data.system.memory_percent + '%';
+                document.getElementById('memory-detail').textContent =
+                    `${data.system.memory_used_gb} / ${data.system.memory_total_gb} GB`;
+                document.getElementById('disk-usage').textContent = data.system.disk_percent + '%';
+                document.getElementById('disk-detail').textContent =
+                    `${data.system.disk_used_gb} / ${data.system.disk_total_gb} GB`;
+
+                // Update status colors
+                const cpuStatus = document.getElementById('cpu-status');
+                if (data.system.cpu_percent < 50) {
+                    cpuStatus.className = 'metric-change positive';
+                    cpuStatus.textContent = 'Normal';
+                } else if (data.system.cpu_percent < 80) {
+                    cpuStatus.className = 'metric-change';
+                    cpuStatus.textContent = 'Moderate';
+                    cpuStatus.style.background = 'rgba(245, 158, 11, 0.1)';
+                    cpuStatus.style.color = 'var(--accent-warning)';
+                } else {
+                    cpuStatus.className = 'metric-change negative';
+                    cpuStatus.textContent = 'High';
+                }
+            }
+
+            // Update application stats
+            if (data.application) {
+                document.getElementById('total-posts').textContent = data.application.total_posts;
+            }
+
+            // Update activity logs
+            if (data.recent_logs && data.recent_logs.length > 0) {
+                const logEntries = document.getElementById('log-entries');
+                logEntries.innerHTML = data.recent_logs.map(log => {
+                    let color = 'var(--text-secondary)';
+                    if (log.includes('ERROR')) color = 'var(--accent-error)';
+                    else if (log.includes('WARNING')) color = 'var(--accent-warning)';
+                    else if (log.includes('INFO')) color = 'var(--accent-success)';
+
+                    return `<div style="color: ${color}; margin-bottom: 0.5rem;">${escapeHtml(log)}</div>`;
+                }).join('');
+            }
+
+            // Update timestamp
+            const now = new Date();
+            document.getElementById('last-update').textContent =
+                `Last updated: ${now.toLocaleTimeString()}`;
+
+        } catch (error) {
+            console.error('Failed to update stats:', error);
+        }
     }
 
-    // Clear logs
-    document.getElementById('clear-logs')?.addEventListener('click', function () {
-        const logsContainer = document.getElementById('logs-container');
-        logsContainer.innerHTML = '<div class="log-entry info"><span class="log-timestamp">[' + new Date().toLocaleTimeString() + ']</span><span class="log-message">INFO: Logs cleared</span></div>';
-        showToast('Logs cleared', 'success');
+    // Escape HTML to prevent XSS
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    // Auto-refresh toggle
+    document.getElementById('auto-refresh').addEventListener('change', function () {
+        autoRefresh = this.checked;
+
+        if (autoRefresh) {
+            updateStats();
+            refreshInterval = setInterval(updateStats, 5000); // Update every 5 seconds
+            showToast('Auto-refresh enabled', 'success');
+        } else {
+            if (refreshInterval) clearInterval(refreshInterval);
+            showToast('Auto-refresh disabled', 'info');
+        }
     });
 
-    // Simulate live log updates
-    function addLogEntry(type, message) {
-        const logsContainer = document.getElementById('logs-container');
-        const logEntry = document.createElement('div');
-        logEntry.className = `log-entry ${type}`;
+    // Clear logs button
+    document.getElementById('clear-logs').addEventListener('click', function () {
+        document.getElementById('log-entries').innerHTML =
+            '<div style="color: var(--text-muted); text-align: center; padding: 2rem;">Log view cleared. Refresh to reload.</div>';
+    });
 
-        const timestamp = new Date().toLocaleTimeString();
-        logEntry.innerHTML = `
-        <span class="log-timestamp">[${timestamp}]</span>
-        <span class="log-message">${type.toUpperCase()}: ${message}</span>
-    `;
+    // Initial load
+    updateStats();
 
-        logsContainer.appendChild(logEntry);
-        logsContainer.scrollTop = logsContainer.scrollHeight;
+    // Start auto-refresh
+    if (autoRefresh) {
+        refreshInterval = setInterval(updateStats, 5000);
     }
 
-    // Simulate periodic log updates (for demo)
-    setInterval(() => {
-        const messages = [
-            { type: 'info', text: 'Heartbeat check completed' },
-            { type: 'info', text: 'Checking RSS feeds for new content' },
-            { type: 'success', text: 'All systems operational' }
-        ];
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', () => {
+        if (refreshInterval) clearInterval(refreshInterval);
+    });
 
-        const random = messages[Math.floor(Math.random() * messages.length)];
-        // Uncomment to see live updates: addLogEntry(random.type, random.text);
-    }, 60000); // Every minute
-
-    updateMonitor();
+    console.log('📊 Monitor page loaded with live stats');
 </script>
 {% endblock %}
