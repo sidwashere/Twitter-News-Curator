@@ -1,0 +1,270 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="draft-page">
+    {% if error %}
+    <div class="empty-state">
+        <h2>{{ error }}</h2>
+        <p>Generate a tweet from the <a href="/articles">Articles</a> page to get started.</p>
+    </div>
+    {% else %}
+    <header class="page-header">
+        <h2>Tweet Draft</h2>
+        <p class="subtitle">Review and customize before posting</p>
+    </header>
+
+    <div class="draft-container">
+        <!-- Article Preview -->
+        <div class="article-preview">
+            <h3>📰 Article</h3>
+            <div class="preview-card">
+                <h4>{{ article.title }}</h4>
+                <p class="summary">{{ article.summary[:300] }}...</p>
+                <a href="{{ article.link }}" target="_blank" class="external-link">
+                    🔗 Read full article
+                </a>
+            </div>
+        </div>
+
+        <!-- Tweet Editor -->
+        <div class="tweet-editor">
+            <h3>✨ Generated Tweet</h3>
+
+            <!-- AI Reasoning Display -->
+            <div class="ai-reasoning">
+                <h4>🧠 AI Thought Process</h4>
+                <div class="reasoning-steps">
+                    <div class="reason-step">
+                        <span class="step-number">1</span>
+                        <div class="step-content">
+                            <strong>Article Analysis:</strong> Scanned title and summary for key points
+                        </div>
+                    </div>
+                    <div class="reason-step">
+                        <span class="step-number">2</span>
+                        <div class="step-content">
+                            <strong>Insight Extraction:</strong> Identified the main newsworthy angle
+                        </div>
+                    </div>
+                    <div class="reason-step">
+                        <span class="step-number">3</span>
+                        <div class="step-content">
+                            <strong>Engagement Hook:</strong> Crafted question/statement to drive interaction
+                        </div>
+                    </div>
+                    <div class="reason-step">
+                        <span class="step-number">4</span>
+                        <div class="step-content">
+                            <strong>Optimization:</strong> Added hashtags, ensured 280-char limit
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tweet-box">
+                <textarea id="tweet-text" maxlength="280">{{ tweet }}</textarea>
+                <div class="tweet-meta">
+                    <span class="char-count" id="char-count">{{ tweet|length }}/280</span>
+                </div>
+            </div>
+
+            <!-- Control Panel -->
+            <div class="control-panel">
+                <h4>🎛️ Fine-Tune Voice & Style</h4>
+
+                <div class="controls-grid">
+                    <div class="control-group">
+                        <label for="tone">Tone</label>
+                        <select id="tone" class="control-select">
+                            <option value="default">Tech Influencer</option>
+                            <option value="casual">Casual</option>
+                            <option value="professional">Professional</option>
+                            <option value="witty">Witty</option>
+                            <option value="analytical">Analytical</option>
+                            <option value="skeptical">Skeptical</option>
+                            <option value="enthusiastic">Enthusiastic</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="creativity">Creativity</label>
+                        <input type="range" id="creativity" min="0" max="100" value="90" class="control-slider">
+                        <span class="slider-value">90%</span>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="tweet-length">Preferred Length</label>
+                        <select id="tweet-length" class="control-select">
+                            <option value="short">Short (120-160 chars)</option>
+                            <option value="medium" selected>Medium (160-220 chars)</option>
+                            <option value="long">Long (220-280 chars)</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="hashtags">Max Hashtags</label>
+                        <input type="number" id="hashtags" min="0" max="5" value="2" class="control-input">
+                    </div>
+
+                    <div class="control-group">
+                        <label for="emoji-style">Emoji Usage</label>
+                        <select id="emoji-style" class="control-select">
+                            <option value="none">None</option>
+                            <option value="minimal" selected>Minimal (1-2)</option>
+                            <option value="moderate">Moderate (2-3)</option>
+                            <option value="heavy">Heavy (3+)</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="perspective">Perspective</label>
+                        <select id="perspective" class="control-select">
+                            <option value="first">First Person (I/We)</option>
+                            <option value="second" selected>Second Person (You)</option>
+                            <option value="third">Third Person (Neutral)</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="cta-style">Call-to-Action</label>
+                        <select id="cta-style" class="control-select">
+                            <option value="question" selected>Question</option>
+                            <option value="statement">Statement</option>
+                            <option value="challenge">Challenge</option>
+                            <option value="none">No CTA</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label>Include Stats/Numbers?</label>
+                        <label class="toggle">
+                            <input type="checkbox" id="include-stats" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="regenerate-section">
+                    <button id="regenerate-btn" class="btn btn-secondary">
+                        🔄 Regenerate with Settings
+                    </button>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button id="post-btn" class="btn btn-primary btn-large">
+                    🚀 Post to Twitter
+                </button>
+                <a href="/articles" class="btn btn-secondary">
+                    ← Back to Articles
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const tweetText = document.getElementById('tweet-text');
+    const charCount = document.getElementById('char-count');
+    const postBtn = document.getElementById('post-btn');
+    const regenerateBtn = document.getElementById('regenerate-btn');
+    const creativitySlider = document.getElementById('creativity');
+
+    // Character counter
+    if (tweetText) {
+        tweetText.addEventListener('input', function () {
+            const count = this.value.length;
+            charCount.textContent = `${count}/280`;
+            charCount.className = 'char-count' + (count > 280 ? ' over-limit' : count > 260 ? ' warning' : '');
+        });
+    }
+
+    // Creativity slider
+    if (creativitySlider) {
+        creativitySlider.addEventListener('input', function () {
+            document.querySelector('.slider-value').textContent = this.value + '%';
+        });
+    }
+
+    // Regenerate tweet
+    if (regenerateBtn) {
+        regenerateBtn.addEventListener('click', async function () {
+            const tone = document.getElementById('tone').value;
+            const temperature = parseInt(document.getElementById('creativity').value) / 100;
+
+            this.disabled = true;
+            this.innerHTML = '⏳ Regenerating...';
+
+            try {
+                const response = await fetch('/api/regenerate-tweet', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tone, temperature })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    tweetText.value = data.full_tweet;
+                    tweetText.dispatchEvent(new Event('input'));
+                    showToast('Tweet regenerated!', 'success');
+                } else {
+                    showToast('Error: ' + data.error, 'error');
+                }
+            } catch (error) {
+                showToast('Network error: ' + error.message, 'error');
+            } finally {
+                this.disabled = false;
+                this.innerHTML = '🔄 Regenerate with Settings';
+            }
+        });
+    }
+
+    // Post tweet
+    if (postBtn) {
+        postBtn.addEventListener('click', async function () {
+            const tweet = tweetText.value;
+
+            if (tweet.length > 280) {
+                showToast('Tweet is too long! Max 280 characters.', 'error');
+                return;
+            }
+
+            if (!confirm('Post this tweet to Twitter?')) {
+                return;
+            }
+
+            this.disabled = true;
+            this.innerHTML = '⏳ Posting...';
+
+            try {
+                const response = await fetch('/api/post-tweet', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ tweet })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showToast('Tweet posted successfully! 🎉', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/history';
+                    }, 1500);
+                } else {
+                    showToast('Error: ' + data.error, 'error');
+                    this.disabled = false;
+                    this.innerHTML = '🚀 Post to Twitter';
+                }
+            } catch (error) {
+                showToast('Network error: ' + error.message, 'error');
+                this.disabled = false;
+                this.innerHTML = '🚀 Post to Twitter';
+            }
+        });
+    }
+</script>
+{% endblock %}

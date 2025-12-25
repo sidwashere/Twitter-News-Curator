@@ -1,0 +1,670 @@
+/* Twitter News Curator - Material Design Enhanced UI */
+/* Modern animations, elevations, and Material UI principles */
+
+/* Import animations library */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+@keyframes ripple {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+/* Material Design Elevation Shadows */
+:root {
+    --elevation-1: 0 2px 4px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+    --elevation-2: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+    --elevation-3: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+    --elevation-4: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
+    --elevation-5: 0 25px 50px rgba(0, 0, 0, 0.15), 0 15px 15px rgba(0, 0, 0, 0.06);
+}
+
+/* Enhanced Page Animations */
+.dashboard,
+.articles-page,
+.draft-page,
+.history-page,
+.settings-page {
+    animation: fadeIn 0.6s ease-out;
+}
+
+/* Stat Cards with Material Elevation */
+.stat-card {
+    box-shadow: var(--elevation-2);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(88, 166, 255, 0.1), transparent);
+    transition: left 0.5s;
+}
+
+.stat-card:hover::before {
+    left: 100%;
+}
+
+.stat-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: var(--elevation-4);
+}
+
+.stat-card:active {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: var(--elevation-3);
+}
+
+/* Article Cards with Staggered Animation */
+.article-card {
+    animation: scaleIn 0.4s ease-out backwards;
+    box-shadow: var(--elevation-2);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.article-card:nth-child(1) {
+    animation-delay: 0.05s;
+}
+
+.article-card:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.article-card:nth-child(3) {
+    animation-delay: 0.15s;
+}
+
+.article-card:nth-child(4) {
+    animation-delay: 0.2s;
+}
+
+.article-card:nth-child(5) {
+    animation-delay: 0.25s;
+}
+
+.article-card:nth-child(6) {
+    animation-delay: 0.3s;
+}
+
+.article-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-primary), #a371f7);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+}
+
+.article-card:hover::after {
+    transform: scaleX(1);
+}
+
+.article-card:hover {
+    box-shadow: var(--elevation-4);
+    transform: translateY(-8px);
+}
+
+/* Button Ripple Effect */
+.btn {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.btn:active::before {
+    width: 300px;
+    height: 300px;
+}
+
+.btn-primary {
+    box-shadow: var(--elevation-2);
+}
+
+.btn-primary:hover {
+    box-shadow: var(--elevation-3);
+    transform: translateY(-2px);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+    box-shadow: var(--elevation-1);
+}
+
+/* Enhanced Modal with Backdrop */
+.modal {
+    backdrop-filter: blur(12px);
+    animation: fadeIn 0.3s ease-out;
+}
+
+.modal-content {
+    animation: scaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--elevation-5);
+}
+
+/* Navbar with Material Elevation */
+.navbar {
+    box-shadow: var(--elevation-2);
+    backdrop-filter: blur(16px);
+    background: rgba(22, 27, 34, 0.95);
+}
+
+.nav-menu a {
+    position: relative;
+}
+
+.nav-menu a::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--accent-primary);
+    transform: translateX(-50%);
+    transition: width 0.3s ease;
+}
+
+.nav-menu a:hover::after,
+.nav-menu a.active::after {
+    width: 80%;
+}
+
+/* Enhanced Input Fields */
+.control-input,
+.control-select,
+.tweet-box textarea {
+    transition: all 0.3s ease;
+    box-shadow: var(--elevation-1);
+}
+
+.control-input:focus,
+.control-select:focus,
+.tweet-box textarea:focus {
+    box-shadow: var(--elevation-2), 0 0 0 3px rgba(88, 166, 255, 0.1);
+    transform: translateY(-1px);
+}
+
+/* Slider Enhancements */
+.control-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    background: linear-gradient(to right,
+            var(--accent-primary) 0%,
+            var(--accent-primary) 50%,
+            var(--bg-card) 50%,
+            var(--bg-card) 100%);
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+.control-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: var(--accent-primary);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: var(--elevation-2);
+    transition: all 0.2s ease;
+}
+
+.control-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    box-shadow: var(--elevation-3);
+}
+
+.control-slider::-webkit-slider-thumb:active {
+    transform: scale(1.1);
+}
+
+/* Toggle Switch Animation */
+.toggle-slider {
+    box-shadow: var(--elevation-1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toggle input:checked+.toggle-slider {
+    box-shadow: var(--elevation-2), 0 0 8px rgba(88, 166, 255, 0.3);
+}
+
+.toggle-slider:before {
+    box-shadow: var(--elevation-1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Filter Chips with Material Touch */
+.filter-chip {
+    box-shadow: var(--elevation-1);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.filter-chip::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(88, 166, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.5s, height 0.5s;
+}
+
+.filter-chip:active::before {
+    width: 200px;
+    height: 200px;
+}
+
+.filter-chip.active {
+    box-shadow: var(--elevation-2), 0 0 12px rgba(88, 166, 255, 0.4);
+    transform: scale(1.05);
+}
+
+/* Loading Skeleton */
+.skeleton {
+    background: linear-gradient(90deg,
+            var(--bg-tertiary) 25%,
+            var(--bg-card) 50%,
+            var(--bg-tertiary) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+    border-radius: 8px;
+}
+
+/* Enhanced Toast Notifications */
+.toast {
+    animation: slideInRight 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--elevation-4);
+}
+
+.toast::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--accent-primary);
+    border-radius: 8px 0 0 8px;
+}
+
+.toast.success::before {
+    background: var(--accent-success);
+}
+
+.toast.error::before {
+    background: var(--accent-error);
+}
+
+/* Progress Bar Material Style */
+.progress-fill {
+    background: linear-gradient(90deg, var(--accent-primary), #a371f7);
+    box-shadow: 0 0 10px rgba(88, 166, 255, 0.5);
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-fill::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(255, 255, 255, 0.3),
+            transparent);
+    animation: shimmer 2s infinite;
+}
+
+/* Section Headers with Underline Animation */
+.page-header h2 {
+    position: relative;
+    display: inline-block;
+}
+
+.page-header h2::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 0;
+    width: 60px;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent-primary), #a371f7);
+    border-radius: 2px;
+    animation: slideInRight 0.6s ease-out;
+}
+
+/* Enhanced Card Sections */
+.setting-section,
+.preview-card,
+.ai-reasoning {
+    box-shadow: var(--elevation-2);
+    transition: all 0.3s ease;
+}
+
+.setting-section:hover,
+.preview-card:hover {
+    box-shadow: var(--elevation-3);
+}
+
+/* Thinking Steps Animation */
+.thinking-step {
+    transform: translateX(-20px);
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.thinking-step.active {
+    transform: translateX(0);
+    opacity: 1;
+    animation: pulse 1s ease-in-out infinite;
+}
+
+/* RSS Feed Items */
+.rss-feed-item {
+    box-shadow: var(--elevation-1);
+    transition: all 0.3s ease;
+}
+
+.rss-feed-item:hover {
+    box-shadow: var(--elevation-2);
+    transform: translateX(4px);
+}
+
+/* History Timeline Enhancement */
+.history-item {
+    animation: fadeIn 0.5s ease-out backwards;
+    transition: all 0.3s ease;
+}
+
+.history-item:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.history-item:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.history-item:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+.history-item:nth-child(4) {
+    animation-delay: 0.4s;
+}
+
+.history-item::before {
+    box-shadow: 0 0 0 4px var(--bg-primary);
+    transition: all 0.3s ease;
+}
+
+.history-item:hover::before {
+    transform: scale(1.5);
+    box-shadow: 0 0 0 8px rgba(88, 166, 255, 0.2);
+}
+
+/* Enhanced Control Panel */
+.control-panel {
+    box-shadow: var(--elevation-2);
+    transition: all 0.3s ease;
+}
+
+.control-group {
+    animation: slideInRight 0.4s ease-out backwards;
+}
+
+.control-group:nth-child(1) {
+    animation-delay: 0.05s;
+}
+
+.control-group:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.control-group:nth-child(3) {
+    animation-delay: 0.15s;
+}
+
+.control-group:nth-child(4) {
+    animation-delay: 0.2s;
+}
+
+.control-group:nth-child(5) {
+    animation-delay: 0.25s;
+}
+
+.control-group:nth-child(6) {
+    animation-delay: 0.3s;
+}
+
+.control-group:nth-child(7) {
+    animation-delay: 0.35s;
+}
+
+.control-group:nth-child(8) {
+    animation-delay: 0.4s;
+}
+
+/* Floating Action Button (FAB) Style */
+.btn-large {
+    box-shadow: var(--elevation-3);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-large:hover {
+    box-shadow: var(--elevation-4);
+    transform: scale(1.05) translateY(-2px);
+}
+
+.btn-large:active {
+    transform: scale(0.98);
+    box-shadow: var(--elevation-2);
+}
+
+/* Add Glow Effect to Interactive Elements */
+.generate-tweet-btn,
+.btn-primary {
+    transition: all 0.3s ease;
+}
+
+.generate-tweet-btn:hover {
+    box-shadow: var(--elevation-3), 0 0 20px rgba(88, 166, 255, 0.3);
+}
+
+/* Smooth Page Transitions */
+@media (prefers-reduced-motion: no-preference) {
+    * {
+        scroll-behavior: smooth;
+    }
+}
+
+/* Enhanced Empty State */
+.empty-state {
+    animation: fadeIn 1s ease-out;
+}
+
+.empty-state::before {
+    content: '🤖';
+    font-size: 4rem;
+    display: block;
+    margin-bottom: 1rem;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* Micro-interactions for Links */
+.external-link,
+.link-badge {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.external-link::before,
+.link-badge::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--accent-primary);
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s ease;
+}
+
+.external-link:hover::before,
+.link-badge:hover::before {
+    transform: scaleX(1);
+    transform-origin: left;
+}
+
+/* Responsive Glow for Success States */
+.status-ok {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+/* Enhanced Grid Transitions */
+.stats-grid,
+.articles-grid {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.stats-grid>*,
+.articles-grid>* {
+    transition: all 0.3s ease;
+}
+
+/* Z-index layering for Material Elevation */
+.navbar {
+    z-index: 100;
+}
+
+.modal {
+    z-index: 1000;
+}
+
+#toast-container {
+    z-index: 2000;
+}
+
+/* Focus Visible for Accessibility */
+*:focus-visible {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+/* Loading State */
+.loading {
+    pointer-events: none;
+    opacity: 0.6;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    border: 3px solid var(--bg-tertiary);
+    border-top-color: var(--accent-primary);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
+}

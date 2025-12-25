@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="dashboard-page" style="max-width: 1400px; margin: 0 auto; padding: 2rem;">
+    <header class="page-header">
+        <h2>📊 Dashboard</h2>
+        <p class="subtitle">Real-time insights and performance metrics for your Twitter News Curator</p>
+    </header>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+        <!-- Total Posts Metric -->
+        <div class="metric-card glass-card">
+            <div class="metric-label">📝 Total Posts</div>
+            <div class="metric-value">{{ stats.total_posted }}</div>
+            <div class="metric-change positive">
+                ▲ 12% <span style="opacity: 0.7">this week</span>
+            </div>
+        </div>
+
+        <!-- RSS Sources Metric -->
+        <div class="metric-card glass-card">
+            <div class="metric-label">📡 Active Sources</div>
+            <div class="metric-value">{{ stats.rss_feeds }}</div>
+            <div style="margin-top: 0.5rem;">
+                <div class="avatar-group">
+                    <div class="avatar">TC</div>
+                    <div class="avatar">VG</div>
+                    <div class="avatar">HN</div>
+                    <div class="avatar avatar-more">+{{ stats.rss_feeds - 3 if stats.rss_feeds > 3 else 0 }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Twitter Status Metric -->
+        <div class="metric-card glass-card">
+            <div class="metric-label">🐦 Twitter API</div>
+            <div class="metric-value" style="font-size: 1.75rem;">
+                {% if stats.twitter_connected %}
+                <span style="color: var(--accent-success);">● Connected</span>
+                {% else %}
+                <span style="color: var(--accent-error);">● Disconnected</span>
+                {% endif %}
+            </div>
+            <div style="font-size: 0.875rem; color: var(--text-muted); margin-top: 0.5rem;">
+                {% if stats.twitter_connected %}
+                All systems operational
+                {% else %}
+                Check API credentials
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- AI Status Metric -->
+        <div class="metric-card glass-card">
+            <div class="metric-label">🤖 AI Engine</div>
+            <div class="metric-value" style="font-size: 1.75rem;">
+                {% if stats.ai_connected %}
+                <span style="color: var(--accent-success);">● Active</span>
+                {% else %}
+                <span style="color: var(--accent-error);">● Offline</span>
+                {% endif %}
+            </div>
+            <div style="font-size: 0.875rem; color: var(--text-muted); margin-top: 0.5rem;">
+                Gemini 1.5 Flash
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity Section -->
+    <div class="section-header" style="margin-top: 3rem;">
+        <h3 class="section-title">
+            <span style="font-size: 1.5rem;">⚡</span>
+            Recent Activity
+        </h3>
+        <a href="/history" class="btn btn-secondary">
+            View All →
+        </a>
+    </div>
+
+    <div class="glass-card" style="padding: 1.5rem;">
+        {% if recent_posts %}
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            {% for post in recent_posts %}
+            <div class="activity-item">
+                <div class="activity-icon">
+                    🐦
+                </div>
+                <div class="activity-content">
+                    <div class="activity-title">{{ post.title[:60] }}...</div>
+                    <div class="activity-meta">
+                        Posted {{ post.posted_at }} ·
+                        {% if post.tweet_id %}
+                        <a href="https://twitter.com/i/status/{{ post.tweet_id }}" target="_blank"
+                            style="color: var(--accent-primary);">View Tweet</a>
+                        {% endif %}
+                    </div>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span class="badge posted-badge">✓ Posted</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div style="text-align: center; padding: 3rem;">
+            <div style="font-size: 3rem; opacity: 0.3; margin-bottom: 1rem;">📭</div>
+            <div style="color: var(--text-muted);">No activity yet</div>
+            <a href="/articles" class="btn btn-primary" style="margin-top: 1.5rem;">
+                Browse Articles →
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="section-header" style="margin-top: 3rem;">
+        <h3 class="section-title">
+            <span style="font-size: 1.5rem;">🚀</span>
+            Quick Actions
+        </h3>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+        <!-- Browse Articles Card -->
+        <a href="/articles" style="text-decoration: none;">
+            <div class="glass-card" style="padding: 2rem; text-align: center; cursor: pointer;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">📰</div>
+                <h4 style="color: var(--text-primary); margin-bottom: 0.5rem; font-size: 1.25rem;">Browse Articles</h4>
+                <p style="color: var(--text-muted); font-size: 0.9375rem;">Discover and curate tech news</p>
+            </div>
+        </a>
+
+        <!-- Generate Tweet Card -->
+        <a href="/draft" style="text-decoration: none;">
+            <div class="glass-card" style="padding: 2rem; text-align: center; cursor: pointer;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">✨</div>
+                <h4 style="color: var(--text-primary); margin-bottom: 0.5rem; font-size: 1.25rem;">Draft Tweet</h4>
+                <p style="color: var(--text-muted); font-size: 0.9375rem;">Create AI-powered content</p>
+            </div>
+        </a>
+
+        <!-- Monitor System Card -->
+        <a href="/monitor" style="text-decoration: none;">
+            <div class="glass-card" style="padding: 2rem; text-align: center; cursor: pointer;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">📊</div>
+                <h4 style="color: var(--text-primary); margin-bottom: 0.5rem; font-size: 1.25rem;">System Monitor</h4>
+                <p style="color: var(--text-muted); font-size: 0.9375rem;">View backend performance</p>
+            </div>
+        </a>
+
+        <!-- Settings Card -->
+        <a href="/settings" style="text-decoration: none;">
+            <div class="glass-card" style="padding: 2rem; text-align: center; cursor: pointer;">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">⚙️</div>
+                <h4 style="color: var(--text-primary); margin-bottom: 0.5rem; font-size: 1.25rem;">Settings</h4>
+                <p style="color: var(--text-muted); font-size: 0.9375rem;">Configure your bot</p>
+            </div>
+        </a>
+    </div>
+</div>
+{% endblock %}

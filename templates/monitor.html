@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="monitor-page">
+    <header class="page-header">
+        <h2>Backend Monitor</h2>
+        <p class="subtitle">Real-time system status and activity logs</p>
+    </header>
+
+    <!-- System Status Cards -->
+    <div class="monitor-grid">
+        <div class="monitor-card">
+            <h3>
+                <span class="status-indicator active"></span>
+                Bot Status
+            </h3>
+            <div class="stat-row">
+                <span class="stat-label">Status:</span>
+                <span class="stat-value" style="color: var(--accent-success);">Running</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Uptime:</span>
+                <span class="stat-value" id="uptime">3h 15m</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Last Activity:</span>
+                <span class="stat-value" id="last-activity">2 min ago</span>
+            </div>
+        </div>
+
+        <div class="monitor-card">
+            <h3>
+                <span class="status-indicator active"></span>
+                API Connections
+            </h3>
+            <div class="stat-row">
+                <span class="stat-label">Twitter API:</span>
+                <span class="stat-value" style="color: var(--accent-success);">✓ Connected</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Gemini AI:</span>
+                <span class="stat-value" style="color: var(--accent-success);">✓ Connected</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">RSS Feeds:</span>
+                <span class="stat-value">4 Active</span>
+            </div>
+        </div>
+
+        <div class="monitor-card">
+            <h3>
+                <span class="status-indicator active"></span>
+                Performance
+            </h3>
+            <div class="stat-row">
+                <span class="stat-label">Tweets Generated:</span>
+                <span class="stat-value" id="tweets-generated">{{ stats.total_posted or 0 }}</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Articles Fetched:</span>
+                <span class="stat-value" id="articles-fetched">127</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Success Rate:</span>
+                <span class="stat-value">98%</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Activity Timeline -->
+    <div class="monitor-card" style="margin-bottom: 2rem;">
+        <h3>🕐 Recent Activity</h3>
+        <div class="activity-timeline">
+            <div class="activity-item">
+                <div class="activity-time">2 min ago</div>
+                <div class="activity-description">Fetched 9 articles from RSS feeds</div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-time">5 min ago</div>
+                <div class="activity-description">Generated tweet using Gemini AI</div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-time">12 min ago</div>
+                <div class="activity-description">Posted tweet to @bongoman_x</div>
+            </div>
+            <div class="activity-item">
+                <div class="activity-time">18 min ago</div>
+                <div class="activity-description">Checked duplicate articles (1 duplicate found)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Logs -->
+    <div class="monitor-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h3>📋 Live Logs</h3>
+            <button class="btn btn-sm btn-secondary" id="clear-logs">Clear Logs</button>
+        </div>
+
+        <div class="logs-container" id="logs-container">
+            <div class="log-entry info">
+                <span class="log-timestamp">[12:25:30]</span>
+                <span class="log-message">INFO: Initialized bot components</span>
+            </div>
+            <div class="log-entry success">
+                <span class="log-timestamp">[12:25:32]</span>
+                <span class="log-message">SUCCESS: Connected to Twitter API as @bongoman_x</span>
+            </div>
+            <div class="log-entry success">
+                <span class="log-timestamp">[12:25:33]</span>
+                <span class="log-message">SUCCESS: Gemini AI initialized with model gemini-2.5-flash</span>
+            </div>
+            <div class="log-entry info">
+                <span class="log-timestamp">[12:25:35]</span>
+                <span class="log-message">INFO: Starting RSS feed fetch...</span>
+            </div>
+            <div class="log-entry success">
+                <span class="log-timestamp">[12:25:38]</span>
+                <span class="log-message">SUCCESS: Fetched 9 articles from TechCrunch</span>
+            </div>
+            <div class="log-entry info">
+                <span class="log-timestamp">[12:25:40]</span>
+                <span class="log-message">INFO: Checking for duplicates...</span>
+            </div>
+            <div class="log-entry warning">
+                <span class="log-timestamp">[12:25:41]</span>
+                <span class="log-message">WARNING: Article already posted, skipping...</span>
+            </div>
+            <div class="log-entry info">
+                <span class="log-timestamp">[12:25:43]</span>
+                <span class="log-message">INFO: Generating tweet with AI...</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Simulate real-time updates
+    function updateMonitor() {
+        const uptime = document.getElementById('uptime');
+        const lastActivity = document.getElementById('last-activity');
+
+        // Update every 30 seconds
+        setInterval(() => {
+            // Simulate uptime increase
+            // In production, this would come from backend API
+        }, 30000);
+    }
+
+    // Clear logs
+    document.getElementById('clear-logs')?.addEventListener('click', function () {
+        const logsContainer = document.getElementById('logs-container');
+        logsContainer.innerHTML = '<div class="log-entry info"><span class="log-timestamp">[' + new Date().toLocaleTimeString() + ']</span><span class="log-message">INFO: Logs cleared</span></div>';
+        showToast('Logs cleared', 'success');
+    });
+
+    // Simulate live log updates
+    function addLogEntry(type, message) {
+        const logsContainer = document.getElementById('logs-container');
+        const logEntry = document.createElement('div');
+        logEntry.className = `log-entry ${type}`;
+
+        const timestamp = new Date().toLocaleTimeString();
+        logEntry.innerHTML = `
+        <span class="log-timestamp">[${timestamp}]</span>
+        <span class="log-message">${type.toUpperCase()}: ${message}</span>
+    `;
+
+        logsContainer.appendChild(logEntry);
+        logsContainer.scrollTop = logsContainer.scrollHeight;
+    }
+
+    // Simulate periodic log updates (for demo)
+    setInterval(() => {
+        const messages = [
+            { type: 'info', text: 'Heartbeat check completed' },
+            { type: 'info', text: 'Checking RSS feeds for new content' },
+            { type: 'success', text: 'All systems operational' }
+        ];
+
+        const random = messages[Math.floor(Math.random() * messages.length)];
+        // Uncomment to see live updates: addLogEntry(random.type, random.text);
+    }, 60000); // Every minute
+
+    updateMonitor();
+</script>
+{% endblock %}

@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="settings-page">
+    <header class="page-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h2>⚙️ Settings</h2>
+            <p class="subtitle">Configure your bot's behavior and sources</p>
+        </div>
+        <button id="save-all-settings" class="btn btn-primary" style="margin-top: 0;">
+            💾 Save All Settings
+        </button>
+    </header>
+
+    <div class="settings-sections">
+        <!-- RSS Feeds Management -->
+        <div class="setting-section">
+            <div class="section-header">
+                <h3>📡 RSS Feed Sources ({{ config.rss_feeds|length }})</h3>
+                <button id="add-feed-btn" class="btn btn-primary btn-sm">+ Add Feed</button>
+            </div>
+
+            <div class="rss-feed-list">
+                {% for feed in config.rss_feeds %}
+                <div class="rss-feed-item">
+                    <div class="feed-info">
+                        <span class="feed-icon">📡</span>
+                        <div>
+                            <div class="feed-url">{{ feed }}</div>
+                        </div>
+                    </div>
+                    <button class="btn btn-sm btn-danger remove-feed-btn" data-url="{{ feed }}">
+                        🗑️ Remove
+                    </button>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Add Feed Form (Hidden by default) -->
+            <div id="add-feed-form" class="add-feed-form" style="display: none;">
+                <h4>Add New RSS Feed</h4>
+                <input type="url" id="new-feed-url" class="control-input"
+                    placeholder="https://example.com/rss/feed.xml">
+                <div class="form-actions">
+                    <button id="save-feed-btn" class="btn btn-primary">Save Feed</button>
+                    <button id="cancel-feed-btn" class="btn btn-secondary">Cancel</button>
+                </div>
+            </div>
+
+            <div class="suggested-feeds">
+                <h4>💡 Suggested Tech Feeds</h4>
+                <div class="suggestion-list">
+                    <div class="suggestion-item">
+                        <span>Hacker News</span>
+                        <button class="btn btn-sm btn-secondary add-suggested-btn"
+                            data-feed="https://news.ycombinator.com/rss">Add</button>
+                    </div>
+                    <div class="suggestion-item">
+                        <span>MIT Technology Review</span>
+                        <button class="btn btn-sm btn-secondary add-suggested-btn"
+                            data-feed="https://www.technologyreview.com/feed/">Add</button>
+                    </div>
+                    <div class="suggestion-item">
+                        <span>Wired</span>
+                        <button class="btn btn-sm btn-secondary add-suggested-btn"
+                            data-feed="https://www.wired.com/feed/rss">Add</button>
+                    </div>
+                    <div class="suggestion-item">
+                        <span>The Register</span>
+                        <button class="btn btn-sm btn-secondary add-suggested-btn"
+                            data-feed="https://www.theregister.com/headlines.atom">Add</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Topic Preferences -->
+        <div class="setting-section">
+            <h3>🎯 Topic Preferences</h3>
+            <p class="section-description">Select which tech topics you want to post about</p>
+
+            <div class="topic-checkboxes">
+                <label class="topic-checkbox">
+                    <input type="checkbox" checked>
+                    <span>🤖 Artificial Intelligence</span>
+                </label>
+                <label class="topic-checkbox">
+                    <input type="checkbox" checked>
+                    <span>🧠 Machine Learning</span>
+                </label>
+                <label class="topic-checkbox">
+                    <input type="checkbox" checked>
+                    <span>⛓️ Blockchain & Crypto</span>
+                </label>
+                <label class="topic-checkbox">
+                    <input type="checkbox" checked>
+                    <span>💻 Hardware</span>
+                </label>
+                <label class="topic-checkbox">
+                    <input type="checkbox" checked>
+                    <span>⚙️ Software Development</span>
+                </label>
+                <label class="topic-checkbox">
+                    <input type="checkbox" checked>
+                    <span>🔒 Cybersecurity</span>
+                </label>
+                <label class="topic-checkbox">
+                    <input type="checkbox" checked>
+                    <span>🚀 Startups & VC</span>
+                </label>
+                <label class="topic-checkbox">
+                    <input type="checkbox" checked>
+                    <span>🔬 Research & Science</span>
+                </label>
+                <label class="topic-checkbox">
+                    <input type="checkbox">
+                    <span>📱 Mobile Tech</span>
+                </label>
+                <label class="topic-checkbox">
+                    <input type="checkbox">
+                    <span>☁️ Cloud Computing</span>
+                </label>
+            </div>
+
+            <button class="btn btn-primary" id="save-topics-btn">Save Topic Preferences</button>
+        </div>
+
+        <!-- AI Configuration -->
+        <div class="setting-section">
+            <h3>🤖 AI Configuration</h3>
+            <div class="setting-item">
+                <label>Model:</label>
+                <span class="setting-value">{{ config.ai_model or 'Not configured' }}</span>
+            </div>
+            <div class="setting-item">
+                <label>Default Temperature:</label>
+                <input type="range" id="default-temp" min="0" max="100" value="90" class="control-slider">
+                <span class="slider-value">90%</span>
+            </div>
+        </div>
+
+        <!-- Twitter Configuration -->
+        <div class="setting-section">
+            <h3>🐦 Twitter</h3>
+            <div class="setting-item">
+                <label>Username:</label>
+                <span class="setting-value">@{{ config.twitter_username or 'Not configured' }}</span>
+            </div>
+            <div class="setting-item">
+                <label>Auto-Post:</label>
+                <label class="toggle">
+                    <input type="checkbox" id="auto-post-toggle" {% if config.auto_post=='true' %}checked{% endif %}>
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            <div class="setting-item">
+                <label>Max Tweets Per Day:</label>
+                <input type="number" id="max-tweets-day" value="10" min="1" max="50" class="control-input">
+            </div>
+        </div>
+
+        <!-- Posting Schedule -->
+        <div class="setting-section">
+            <h3>⏰ Posting Schedule</h3>
+            <p class="section-description">Define when the bot should automatically post (if auto-post is enabled)</p>
+
+            <div class="schedule-times">
+                <div class="time-input-group">
+                    <label>Morning Post:</label>
+                    <input type="time" class="control-input" value="09:00">
+                </div>
+                <div class="time-input-group">
+                    <label>Afternoon Post:</label>
+                    <input type="time" class="control-input" value="14:00">
+                </div>
+                <div class="time-input-group">
+                    <label>Evening Post:</label>
+                    <input type="time" class="control-input" value="18:00">
+                </div>
+            </div>
+
+            <button class="btn btn-primary" id="save-schedule-btn">Save Schedule</button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/settings.js') }}"></script>
+{% endblock %}

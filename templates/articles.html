@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="articles-page">
+    <header class="page-header">
+        <h2>📰 News Articles</h2>
+        <p class="subtitle">Browse, filter, and generate tweets from tech news</p>
+    </header>
+
+    <!-- Content Controls -->
+    <div class="content-controls"
+        style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h3 style="margin: 0;">🎛️ Content Controls</h3>
+            <button id="fetch-articles-btn" class="btn btn-primary">
+                🔄 Fetch Latest Articles
+            </button>
+        </div>
+
+        <!-- Source Selection -->
+        <div class="source-selection" style="margin-bottom: 1.5rem;">
+            <label style="display: block; margin-bottom: 0.75rem; font-weight: 600;">📡 RSS Sources</label>
+            <div class="source-chips" style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
+                {% for feed in config.rss_feeds %}
+                <label class="source-chip"
+                    style="padding: 0.5rem 1rem; background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 20px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 0.5rem;">
+                    <input type="checkbox" class="source-checkbox" value="{{ feed }}" checked style="cursor: pointer;">
+                    <span style="font-size: 0.85rem;">{{ feed.split('/')[-2] if '/' in feed else feed[:30] }}</span>
+                </label>
+                {% endfor %}
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">Select which sources to fetch
+                from</p>
+        </div>
+
+        <!-- Topic Filters -->
+        <div class="topic-selection">
+            <label style="display: block; margin-bottom: 0.75rem; font-weight: 600;">🎯 Filter by Topic</label>
+            <div class="filter-chips">
+                <div class="filter-chip active" data-topic="all">All Topics</div>
+                <div class="filter-chip" data-topic="ai">🤖 AI</div>
+                <div class="filter-chip" data-topic="ml">🧠 ML</div>
+                <div class="filter-chip" data-topic="blockchain">⛓️ Blockchain</div>
+                <div class="filter-chip" data-topic="hardware">💻 Hardware</div>
+                <div class="filter-chip" data-topic="software">⚙️ Software</div>
+                <div class="filter-chip" data-topic="security">🔒 Security</div>
+                <div class="filter-chip" data-topic="startups">🚀 Startups</div>
+                <div class="filter-chip" data-topic="research">🔬 Research</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Articles Stats -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <div>
+            <span id="articles-count" style="font-size: 0.9rem; color: var(--text-secondary);">
+                Showing {{ articles|length }} articles
+            </span>
+        </div>
+        <div>
+            <span id="last-fetch" style="font-size: 0.85rem; color: var(--text-muted);">
+                Last fetched: Just now
+            </span>
+        </div>
+    </div>
+
+    <div class="articles-grid">
+        {% for article in articles %}
+        <div class="article-card {% if article.is_posted %}posted{% endif %}">
+            <div class="article-header">
+                <h3 class="article-title">{{ article.title }}</h3>
+                {% if article.is_posted %}
+                <span class="badge posted-badge">✓ Posted</span>
+                {% else %}
+                <span class="badge new-badge">New</span>
+                {% endif %}
+            </div>
+
+            <p class="article-summary">{{ article.summary[:150] }}...</p>
+
+            <div class="article-meta">
+                <span class="article-source">{{ article.source.split('/')[-2] if '/' in article.source else 'Source'
+                    }}</span>
+                <span class="article-date">{{ article.published if article.published else 'Recently' }}</span>
+            </div>
+
+            <div class="article-actions">
+                <a href="{{ article.link }}" target="_blank" class="btn btn-secondary">
+                    🔗 Read Article
+                </a>
+                {% if not article.is_posted %}
+                <button class="btn btn-primary generate-tweet-btn" data-article-url="{{ article.link }}">
+                    ✨ Generate Tweet
+                </button>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if not articles %}
+    <div class="empty-state">
+        <p>No articles found. Check your RSS feed configuration.</p>
+    </div>
+    {% endif %}
+</div>
+
+<div id="progress-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <h3>🤖 AI is thinking...</h3>
+        <div class="thinking-process">
+            <div class="thinking-step active">
+                <span class="step-icon">1️⃣</span>
+                <span class="step-text">Analyzing article content...</span>
+            </div>
+            <div class="thinking-step">
+                <span class="step-icon">2️⃣</span>
+                <span class="step-text">Identifying key insights...</span>
+            </div>
+            <div class="thinking-step">
+                <span class="step-icon">3️⃣</span>
+                <span class="step-text">Crafting engaging hook...</span>
+            </div>
+            <div class="thinking-step">
+                <span class="step-icon">4️⃣</span>
+                <span class="step-text">Optimizing for engagement...</span>
+            </div>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/articles.js') }}"></script>
+<script>
+    document.querySelectorAll('.generate-tweet-btn').forEach(btn => {
+        btn.addEventListener('click', async function () {
+            const articleUrl = this.dataset.articleUrl;
+
+            // Show progress modal
+            const modal = document.getElementById('progress-modal');
+            modal.style.display = 'flex';
+
+            // Animate thinking steps
+            let step = 0;
+            const steps = modal.querySelectorAll('.thinking-step');
+            const progressFill = modal.querySelector('.progress-fill');
+
+            const interval = setInterval(() => {
+                if (step < steps.length) {
+                    steps.forEach(s => s.classList.remove('active'));
+                    steps[step].classList.add('active');
+                    progressFill.style.width = ((step + 1) / steps.length * 100) + '%';
+                    step++;
+                }
+            }, 800);
+
+            try {
+                const response = await fetch('/api/generate-tweet', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ article_url: articleUrl })
+                });
+
+                const data = await response.json();
+
+                clearInterval(interval);
+
+                if (response.ok) {
+                    showToast('Tweet generated! Redirecting to draft...', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/draft';
+                    }, 1000);
+                } else {
+                    showToast('Error: ' + data.error, 'error');
+                    modal.style.display = 'none';
+                }
+            } catch (error) {
+                clearInterval(interval);
+                showToast('Network error: ' + error.message, 'error');
+                modal.style.display = 'none';
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,52 @@
+{
+    "contextFile": "context for the news curator.md",
+    "excludePatterns": [
+        "node_modules",
+        ".git",
+        "__pycache__",
+        "*.pyc",
+        "venv",
+        "env",
+        ".env",
+        "dist",
+        "build",
+        ".pytest_cache",
+        ".vscode",
+        ".idea",
+        "*.log"
+    ],
+    "includeFileTypes": [
+        ".py",
+        ".js",
+        ".ts",
+        ".jsx",
+        ".tsx",
+        ".json",
+        ".md",
+        ".txt",
+        ".yml",
+        ".yaml",
+        ".toml",
+        ".ini",
+        ".cfg",
+        ".sh",
+        ".ps1",
+        ".bat"
+    ],
+    "autoSections": {
+        "architecture": true,
+        "structure": true,
+        "dependencies": true,
+        "stats": true,
+        "changes": true
+    },
+    "manualSections": {
+        "overview": true,
+        "notes": true,
+        "monetization": true,
+        "strategy": true
+    },
+    "updateFrequency": "daily",
+    "trackChanges": true,
+    "maxChangelogEntries": 10
+}

@@ -1,0 +1,252 @@
+/* Additional CSS for enhanced UI features */
+
+/* Topic Filters */
+.topic-filters {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.topic-filters h3 {
+    margin-bottom: 1rem;
+}
+
+.filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.filter-chip {
+    padding: 0.5rem 1rem;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.filter-chip:hover {
+    background: var(--bg-secondary);
+    border-color: var(--accent-secondary);
+}
+
+.filter-chip.active {
+    background: var(--accent-primary);
+    color: #0d1117;
+    border-color: var(--accent-primary);
+}
+
+/* Settings Page Enhancements */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.section-description {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+.btn-sm {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.85rem;
+}
+
+.btn-danger {
+    background: var(--accent-error);
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #ff6b6b;
+}
+
+/* RSS Feed List */
+.rss-feed-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.rss-feed-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+
+.feed-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+}
+
+.feed-icon {
+    font-size: 1.2rem;
+}
+
+.feed-url {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    word-break: break-all;
+}
+
+/* Add Feed Form */
+.add-feed-form {
+    background: var(--bg-tertiary);
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+}
+
+.add-feed-form h4 {
+    margin-bottom: 1rem;
+}
+
+.add-feed-form .control-input {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.form-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+/* Suggested Feeds */
+.suggested-feeds {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.suggested-feeds h4 {
+    margin-bottom: 1rem;
+}
+
+.suggestion-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 0.75rem;
+}
+
+.suggestion-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+}
+
+.suggestion-item span {
+    font-size: 0.9rem;
+}
+
+/* Topic Checkboxes */
+.topic-checkboxes {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+}
+
+.topic-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.topic-checkbox:hover {
+    background: var(--bg-secondary);
+    border-color: var(--accent-secondary);
+}
+
+.topic-checkbox input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.topic-checkbox span {
+    font-size: 0.9rem;
+}
+
+/* Schedule Times */
+.schedule-times {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.time-input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.time-input-group label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.time-input-group input[type="time"] {
+    padding: 0.6rem;
+}
+
+/* Enhanced Control Grid for more items */
+.controls-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+/* Topic filtering on articles page */
+.article-card[data-topic] {
+    transition: all 0.3s;
+}
+
+.article-card.hidden {
+    display: none;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .topic-checkboxes {
+        grid-template-columns: 1fr;
+    }
+
+    .schedule-times {
+        grid-template-columns: 1fr;
+    }
+
+    .filter-chips {
+        gap: 0.5rem;
+    }
+
+    .filter-chip {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.8rem;
+    }
+}

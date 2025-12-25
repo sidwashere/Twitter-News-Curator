@@ -1,0 +1,49 @@
+{
+    "rss_feeds": [
+        "https://techcrunch.com/category/artificial-intelligence/feed/",
+        "https://www.theverge.com/rss/index.xml",
+        "https://venturebeat.com/category/ai/feed/",
+        "https://feeds.arstechnica.com/arstechnica/technology-lab",
+        "https://news.ycombinator.com/rss"
+    ],
+    "tweet_style": {
+        "hashtags": [
+            "#AI",
+            "#Tech"
+        ],
+        "max_hashtags": 1,
+        "include_emoji": false,
+        "max_length": 280,
+        "tone": "thought_leader",
+        "content_priority": "insight_over_announcement"
+    },
+    "posting_schedule": {
+        "times": [
+            "09:00",
+            "14:00",
+            "18:00"
+        ],
+        "timezone": "UTC",
+        "auto_post": false,
+        "max_per_day": 10
+    },
+    "article_tracking": {
+        "data_file": "data/posted_articles.json",
+        "max_history": 1000
+    },
+    "ai_settings": {
+        "model": "gemini-2.5-flash",
+        "temperature": 0.9,
+        "max_retries": 3
+    },
+    "topic_preferences": [
+        "\ud83e\udd16 Artificial Intelligence",
+        "\ud83e\udde0 Machine Learning",
+        "\u26d3\ufe0f Blockchain & Crypto",
+        "\ud83d\udcbb Hardware",
+        "\u2699\ufe0f Software Development",
+        "\ud83d\udd12 Cybersecurity",
+        "\ud83d\ude80 Startups & VC",
+        "\ud83d\udd2c Research & Science"
+    ]
+}

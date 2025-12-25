@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="history-page">
+    <header class="page-header">
+        <h2>Posting History</h2>
+        <p class="subtitle">View all your posted tweets</p>
+    </header>
+
+    {% if posts %}
+    <div class="history-timeline">
+        {% for post in posts %}
+        <div class="history-item">
+            <div class="history-date">{{ post.posted_at }}</div>
+            <div class="history-content">
+                <h4>{{ post.title }}</h4>
+                <div class="tweet-links">
+                    <a href="{{ post.url }}" target="_blank" class="link-badge">📰 Article</a>
+                    {% if post.tweet_id %}
+                    <a href="https://twitter.com/user/status/{{ post.tweet_id }}" target="_blank" class="link-badge">🐦
+                        Tweet</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <p>No posts yet. Start curating!</p>
+        <a href="/articles" class="btn btn-primary">Browse Articles</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
