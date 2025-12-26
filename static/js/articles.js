@@ -52,6 +52,61 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // Generate Tweet Buttons
+    document.querySelectorAll('.generate-tweet-btn').forEach(btn => {
+        btn.addEventListener('click', async function () {
+            const articleUrl = this.dataset.articleUrl;
+
+            // Show progress modal
+            const modal = document.getElementById('progress-modal');
+            if (modal) {
+                modal.style.display = 'flex';
+
+                // Animate thinking steps
+                const steps = modal.querySelectorAll('.thinking-step');
+                steps.forEach((step, index) => {
+                    setTimeout(() => {
+                        step.classList.add('active');
+                    }, index * 800);
+                });
+
+                // Animate progress bar
+                const progressFill = modal.querySelector('.progress-fill');
+                if (progressFill) {
+                    progressFill.style.width = '0%';
+                    setTimeout(() => {
+                        progressFill.style.width = '100%';
+                    }, 100);
+                }
+            }
+
+            try {
+                const response = await fetch('/api/generate-tweet', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ article_url: articleUrl })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showToast('Tweet generated! Redirecting to draft...', 'success');
+
+                    // Redirect to draft page after short delay
+                    setTimeout(() => {
+                        window.location.href = '/draft';
+                    }, 1000);
+                } else {
+                    if (modal) modal.style.display = 'none';
+                    showToast('Error: ' + (data.error || 'Failed to generate tweet'), 'error');
+                }
+            } catch (error) {
+                if (modal) modal.style.display = 'none';
+                showToast('Network error: ' + error.message, 'error');
+            }
+        });
+    });
+
     // Source checkbox styling
     document.querySelectorAll('.source-chip').forEach(chip => {
         chip.addEventListener('click', function (e) {
@@ -93,3 +148,4 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 console.log('✨ Articles page enhanced controls loaded');
+
